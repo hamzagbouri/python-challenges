@@ -49,3 +49,10 @@ def supprimer_task(id):
     session.delete(t)
     session.commit()
     return True
+def modify_task(task):
+    session=get_session()
+    t=session.query(Task).get(task.id)
+    t.description=task.description
+    t.priorite = task.priorite
+    session.commit()
+    return t

@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+from tkinter.ttk import Combobox
 from database import get_session
 from database import get_all_tasks
 from database import *
@@ -69,8 +70,38 @@ def on_select(event):
         elif listbox_selected == listbox_terminee:
             marquer_terminer.config(state="disabled")
         tache_suprimer.config(state="active", command=lambda: supprimer_tache(task))
+        tache_modifier.config(state="active", command=lambda: ouvrir_modifier(task))
 
         print(task)
+def ouvrir_modifier(task):
+    new_win = Toplevel(app)
+    new_win.title("Modifier la tâche")
+    new_win.geometry("350x180")
+    new_win.configure(bg="#f5f5f5")
+
+    # ---------- Title ----------
+    Label(new_win, text=f"Modifier la tâche: {task.description}", bg="#f5f5f5", font=("Arial", 12, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
+
+    # ---------- Description ----------
+    Label(new_win, text="Description:", bg="#f5f5f5").grid(row=1, column=0, sticky="e", padx=10, pady=5)
+    desc_var = StringVar(value=task.description)
+    Entry(new_win, textvariable=desc_var, width=25).grid(row=1, column=1, padx=10, pady=5)
+
+    # ---------- Priorité ----------
+    Label(new_win, text="Priorité:", bg="#f5f5f5").grid(row=2, column=0, sticky="e", padx=10, pady=5)
+    priorite_var = StringVar(value=task.priorite)
+    OptionMenu(new_win, priorite_var, "P1", "P2", "P3").grid(row=2, column=1, padx=10, pady=5, sticky="w")
+
+    # ---------- Modifier Button ----------
+    def modifier_task():
+        task.description = desc_var.get()
+        task.priorite = priorite_var.get()
+        modify_task(task)
+        afficher_taches()
+        new_win.destroy()  
+
+    Button(new_win, text="Modifier", bg="#4CAF50", fg="white", width=15, command=modifier_task).grid(row=3, column=0, columnspan=2, pady=15)
+
 #-------------------------------- Interface
 top_frame = Frame(app, pady=10)
 top_frame.pack()
@@ -108,8 +139,10 @@ listbox_terminee.bind("<<ListboxSelect>>", on_select)
 buttons_frame = Frame(bottom_frame)
 buttons_frame.place(relx=0, rely=0.8, relwidth=1, relheight=0.2)
 marquer_terminer= Button(buttons_frame, text="Terminer tache", state="disabled")
-marquer_terminer.pack(side="right")
+marquer_terminer.pack(side="left")
 tache_suprimer = Button(buttons_frame, text="Supprimer tache", state="disabled")
-tache_suprimer.pack(side='right')
+tache_modifier = Button(buttons_frame, text="Modifier tache", state="disabled")
+tache_suprimer.pack(side='right',padx=5)
+tache_modifier.pack(side='right',padx=5)
 afficher_taches()
 app.mainloop()
