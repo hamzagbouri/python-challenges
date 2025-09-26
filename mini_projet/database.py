@@ -9,7 +9,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     description = Column(String(50), nullable=False)
     priorite = Column(Enum("P1", "P2", "P3", name="priorite_enum"), nullable=False)
-    status = Column(Enum("En cours", "Terminé", name="status_enum"), nullable=False, default="En cours")
+    status = Column(Enum("A faire", "En cours", "Terminé", name="status_enum"), nullable=False, default="A faire")
 
     def __str__(self):
         return f"{self.id}, {self.description}"
@@ -21,6 +21,7 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 def get_session():
     return Session()
+
 def get_all_tasks():
     tasks = get_session().query(Task).all()
     return (tasks)
@@ -56,3 +57,12 @@ def modify_task(task):
     t.priorite = task.priorite
     session.commit()
     return t
+def modify_stats(task):
+    session = get_session()
+    t = session.query(Task).filter(Task.id == task.id).first()
+    if t:
+        t.status = task.status
+        session.commit()
+        return t
+    else:
+        return False
